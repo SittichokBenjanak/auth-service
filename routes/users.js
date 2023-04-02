@@ -70,6 +70,16 @@ router.post("/register", async function (req, res, next) {
     ""
   ); //ค่าที่ 3 คือ route (fanout ไม่ต้องใส่ค่า)
 
+  // ส่งข้อมูล User ไปให้ order-service
+  await channel.assertQueue("q.sittichok.order.service", {
+    durable: true, // ถ้าล่มจะกลับมาทำงานอันที่ค้าง auto
+  });
+  await channel.bindQueue(
+    "q.sittichok.order.service",
+    "ex.sittichok.fanout",
+    ""
+  ); //ค่าที่ 3 คือ route (fanout ไม่ต้องใส่ค่า)
+
   channel.publish(
     "ex.sittichok.fanout",
     "",
